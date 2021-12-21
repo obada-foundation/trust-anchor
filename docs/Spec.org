@@ -2,32 +2,33 @@
 #+NAME: Andrii Tarykin
 #+Title: OBADA Trust Anchor JWT method 
 
-* Encryption method
+* JWT signatures method
 
-** PHP version of trust-anchror uses RS256
+** PHP version
 
-*** RS means RSASSA-PKCS1-v1_5
+PHP based application version of trust-anchror uses RS256 algorithm. RS means RSASSA-PKCS1-v1_5. There some important information about this method:
 
-**** RSAES-PKCS1-v1_5 is no longer safe for encryption, RSASSA-PKCS1-v1_5 is still suitable for digital signatures.
+*** RSAES-PKCS1-v1_5 is no longer safe for encryption, RSASSA-PKCS1-v1_5 is still suitable for digital signatures.
 
-**** JWTs signed with RSASSA-PKCS1-v1_5 have a deterministic signature, meaning that the same JWT header & payload will always generate the same signature. 
+*** JWTs signed with RSASSA-PKCS1-v1_5 have a deterministic signature, meaning that the same JWT header & payload will always generate the same signature. 
 
 *** Hashing algorithm used by the signature algorithm. 256 means SHA-256.
-*** [[https://datatracker.ietf.org/doc/html/rfc7518][RFC 7518]]
 
-** Go version going to use EdDSA
+*** Full details in [[https://datatracker.ietf.org/doc/html/rfc7518][RFC 7518]]
 
-*** [[https://ed25519.cr.yp.to/][Benefits]]
+** Go version
+
+Go version going to use EdDSA signatures, see   [[https://ed25519.cr.yp.to/][benefits]]
 
 * JWT token structure and how proofs work
 
-** Base64 encoded token
+** JWT token encoded by Base64
 
 #+begin_src sh
 eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ0cmFkZWxvb3AiLCJ2ZXJpZmljYXRpb25fdXJsIjoiaHR0cHM6XC9cL3RydXN0LWFuY2hvci50cmFkZWxvb3AuY29tIiwidmVyaWZpY2F0aW9uX2h0dHBfbWV0aG9kIjoiUE9TVCIsInZlcmlmaWNhdGlvbl9odHRwX3Zhcl9uYW1lIjoidG9rZW4iLCJpYXQiOjE2NDAwOTI4MDcsImF1ZCI6ImI3M2UyZDIyLTYyNjAtMTFlYy1hMTZhLTAyNDJhYzE0MDAwMyIsInJlZ2lzdHJhcl9pZCI6ImI1ZGIyZTg4YTE1ODI5Y2UzYTFiNTU2NjE3NmUxMTBjIn0.LDh0tYx_ZlS01i5hwJhuQLGrucmVtCpN5s_k0qwiWA3wXDPV31saaJKqv-RAA_h3lnSKbx6LTiTVIjcgZz_xmXyo32xG96zhCpV-QIwEGw5yV-U3IpVjvxKJD6dbrEldZxcyJalmXoQppfE7hM1kWUrrHPsLKq4UJDkN0DJnCslTkgnXsAm1JCJC9U0L9I4IEas1q2N-MsJ8iaioPc03pttllUmarVXgia3PgRK_P4cAQy_XW22WgazyxxG9v2Eo5wzKFmL90_gOjdI-N8x-3swJ0TawFt-AASoQwVnUgUmSGNUxSAXEV1tVLrzCnz4cIKFCXj5AuqZEbqvAq-m9GNv7jARrM2n9b0z9lw39EkheeYVMfRtZUVpL6CJNQUGvHPZsLCGv_mCwFH6ZUGdthmPbcP6mWfadQpZtXzOjVgl7jXMwsss-8NxusWgqhRO8YhU10yR6_S3X9shy9s6h3JCeMfIXUnFT6E-l2ntEzXWYt0HBBkSkacqpNSHSbqeRhOKZE2jprwZfKB4SRIHqAAoOTAfoLDGLdweWaNZ9nqJtjcsd1wKcDjZexpv8sN1qy6_9Td4MM7gJIRUeS4nZlVj4_OQtSMbWDMWnZku6CA7RGd7e9KDUbeWGLXJ5Smx8Z-vFCT9Is_KF5zFJhEOPvD_kbGYE4vKCUzHvdcTg9kU
 #+end_src
 
-** Base64 decoded token body
+** Decoded token body represented as a JSON
 
 #+begin_src javascript
 {
@@ -39,6 +40,23 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ0cmFkZWxvb3AiLCJ2ZXJpZmljYXRpb25
   "aud": "b73e2d22-6260-11ec-a16a-0242ac140003",
   "registrar_id": "b5db2e88a15829ce3a1b5566176e110c"
 }
+#+end_src
+
+TODO:
+- Identify properties naming and types 
+
+The origin idea was that this token can be converted back to HTTP request to the origin trust anchor API that issued it. Only API is able to tell us if user complied or not at the moment of request. 
+
+#+begin_src sh
+curl -X POST https://trust-anchor.tradeloop.com -H 'content-type: application/json' -d '{"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ0cmFkZWxvb3AiLCJ2ZXJpZmljYXRpb25fdXJsIjoiaHR0cHM6XC9cL3RydXN0LWFuY2hvci50cmFkZWxvb3AuY29tIiwidmVyaWZpY2F0aW9uX2h0dHBfbWV0aG9kIjoiUE9TVCIsInZlcmlmaWNhdGlvbl9odHRwX3Zhcl9uYW1lIjoidG9rZW4iLCJpYXQiOjE2NDAwOTI4MDcsImF1ZCI6ImI3M2UyZDIyLTYyNjAtMTFlYy1hMTZhLTAyNDJhYzE0MDAwMyIsInJlZ2lzdHJhcl9pZCI6ImI1ZGIyZTg4YTE1ODI5Y2UzYTFiNTU2NjE3NmUxMTBjIn0.LDh0tYx_ZlS01i5hwJhuQLGrucmVtCpN5s_k0qwiWA3wXDPV31saaJKqv-RAA_h3lnSKbx6LTiTVIjcgZz_xmXyo32xG96zhCpV-QIwEGw5yV-U3IpVjvxKJD6dbrEldZxcyJalmXoQppfE7hM1kWUrrHPsLKq4UJDkN0DJnCslTkgnXsAm1JCJC9U0L9I4IEas1q2N-MsJ8iaioPc03pttllUmarVXgia3PgRK_P4cAQy_XW22WgazyxxG9v2Eo5wzKFmL90_gOjdI-N8x-3swJ0TawFt-AASoQwVnUgUmSGNUxSAXEV1tVLrzCnz4cIKFCXj5AuqZEbqvAq-m9GNv7jARrM2n9b0z9lw39EkheeYVMfRtZUVpL6CJNQUGvHPZsLCGv_mCwFH6ZUGdthmPbcP6mWfadQpZtXzOjVgl7jXMwsss-8NxusWgqhRO8YhU10yR6_S3X9shy9s6h3JCeMfIXUnFT6E-l2ntEzXWYt0HBBkSkacqpNSHSbqeRhOKZE2jprwZfKB4SRIHqAAoOTAfoLDGLdweWaNZ9nqJtjcsd1wKcDjZexpv8sN1qy6_9Td4MM7gJIRUeS4nZlVj4_OQtSMbWDMWnZku6CA7RGd7e9KDUbeWGLXJ5Smx8Z-vFCT9Is_KF5zFJhEOPvD_kbGYE4vKCUzHvdcTg9kU"}'
+#+end_src
+
+After executing such request we can see if user complient or not:
+
+#+begin_src javascript
+  {
+    "is_complient": true
+  }
 #+end_src
 
 ** Verification with [[https://jwt.io/#debugger-io?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ0cmFkZWxvb3AiLCJ2ZXJpZmljYXRpb25fdXJsIjoiaHR0cHM6XC9cL3RydXN0LWFuY2hvci50cmFkZWxvb3AuY29tIiwidmVyaWZpY2F0aW9uX2h0dHBfbWV0aG9kIjoiUE9TVCIsInZlcmlmaWNhdGlvbl9odHRwX3Zhcl9uYW1lIjoidG9rZW4iLCJpYXQiOjE2NDAwOTI4MDcsImF1ZCI6ImI3M2UyZDIyLTYyNjAtMTFlYy1hMTZhLTAyNDJhYzE0MDAwMyIsInJlZ2lzdHJhcl9pZCI6ImI1ZGIyZTg4YTE1ODI5Y2UzYTFiNTU2NjE3NmUxMTBjIn0.LDh0tYx_ZlS01i5hwJhuQLGrucmVtCpN5s_k0qwiWA3wXDPV31saaJKqv-RAA_h3lnSKbx6LTiTVIjcgZz_xmXyo32xG96zhCpV-QIwEGw5yV-U3IpVjvxKJD6dbrEldZxcyJalmXoQppfE7hM1kWUrrHPsLKq4UJDkN0DJnCslTkgnXsAm1JCJC9U0L9I4IEas1q2N-MsJ8iaioPc03pttllUmarVXgia3PgRK_P4cAQy_XW22WgazyxxG9v2Eo5wzKFmL90_gOjdI-N8x-3swJ0TawFt-AASoQwVnUgUmSGNUxSAXEV1tVLrzCnz4cIKFCXj5AuqZEbqvAq-m9GNv7jARrM2n9b0z9lw39EkheeYVMfRtZUVpL6CJNQUGvHPZsLCGv_mCwFH6ZUGdthmPbcP6mWfadQpZtXzOjVgl7jXMwsss-8NxusWgqhRO8YhU10yR6_S3X9shy9s6h3JCeMfIXUnFT6E-l2ntEzXWYt0HBBkSkacqpNSHSbqeRhOKZE2jprwZfKB4SRIHqAAoOTAfoLDGLdweWaNZ9nqJtjcsd1wKcDjZexpv8sN1qy6_9Td4MM7gJIRUeS4nZlVj4_OQtSMbWDMWnZku6CA7RGd7e9KDUbeWGLXJ5Smx8Z-vFCT9Is_KF5zFJhEOPvD_kbGYE4vKCUzHvdcTg9kU][jwt.io]]
@@ -130,4 +148,6 @@ BHz8rfWI0XeiubOH4JHjEVt6+py8Wgt+JVS/5Z8uTtKPVXbzjR7S3TBrcA/tY2rl
 -----END PRIVATE KEY-----
 #+end_src
 
-You should keep to see "Signature Verified" 
+You should keep see "Signature Verified" same as before. Try to change token body or public or private key to see how it change signature check status.
+
+* Verifyable credentils and DIDs
