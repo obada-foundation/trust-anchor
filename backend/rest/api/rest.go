@@ -10,11 +10,20 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/jwtauth/v5"
+	"github.com/obada-foundation/trust-anchor/ta"
+	"github.com/obada-foundation/trust-anchor/ta/compliance"
 )
+
+const hardBodyLimit = 1024 * 64 // limit size of body
 
 // Rest is a rest access server
 type Rest struct {
 	Version string
+
+	AuthTokenSvc  *jwtauth.JWTAuth
+	TaTokenSvc    *ta.TokenService
+	ComplianceSvc *compliance.Service
 
 	Logger         *log.Logger
 	TrustAnchorURL string
@@ -23,7 +32,8 @@ type Rest struct {
 	httpsServer    *http.Server
 	lock           sync.Mutex
 
-	publicRest public
+	publicRest  public
+	privateRest private
 }
 
 // Run the lister and request's router, activate rest server
@@ -85,14 +95,22 @@ func (s *Rest) routes() chi.Router {
 
 	router.Use(mdLogger)
 	router.Use(middleware.Throttle(1000), middleware.RealIP, Recoverer(s.Logger))
-	router.Use(AppInfo("circle", "TradeLoop", s.Version), Ping)
+	router.Use(AppInfo("Trust Anchor", "OBADA Foundation", s.Version), Ping)
 
-	s.publicRest = s.handlerGroups()
+	s.publicRest, s.privateRest = s.handlerGroups()
 
 	// api routes
 	router.Route("/api/v1", func(rapi chi.Router) {
+		rapi.Group(func(rpriv chi.Router) {
+			rpriv.Use(jwtauth.Verifier(s.AuthTokenSvc))
+			rpriv.Use(jwtauth.Authenticator)
+
+			rpriv.Post("/nft/register", s.privateRest.registerNFT)
+		})
+
 		rapi.Group(func(rpub chi.Router) {
-			rpub.Get("/version", s.publicRest.verifyToken)
+			rpub.Post("/user/register", s.publicRest.registerUser)
+			rpub.Get("/token", s.publicRest.token)
 			rpub.Get("/verify", s.publicRest.verifyToken)
 		})
 	})
@@ -100,12 +118,19 @@ func (s *Rest) routes() chi.Router {
 	return router
 }
 
-func (s *Rest) handlerGroups() public {
+func (s *Rest) handlerGroups() (public, private) {
 	pubGrp := public{
-		logger: s.Logger,
+		logger:        s.Logger,
+		complianceSvc: s.ComplianceSvc,
+		authTokenSvc:  s.AuthTokenSvc,
 	}
 
-	return pubGrp
+	privGrp := private{
+		logger:     s.Logger,
+		taTokenSvc: s.TaTokenSvc,
+	}
+
+	return pubGrp, privGrp
 }
 
 func (s *Rest) makeHTTPServer(address string, port int, router http.Handler) *http.Server {

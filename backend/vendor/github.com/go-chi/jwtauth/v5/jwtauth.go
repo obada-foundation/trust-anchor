@@ -3,7 +3,9 @@ package jwtauth
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
@@ -134,6 +136,8 @@ func (ja *JWTAuth) Decode(tokenString string) (jwt.Token, error) {
 }
 
 func (ja *JWTAuth) sign(token jwt.Token) ([]byte, error) {
+	l := log.New(os.Stdout, "ssss", 0)
+	l.Print(ja)
 	return jwt.Sign(token, ja.alg, ja.signKey)
 }
 

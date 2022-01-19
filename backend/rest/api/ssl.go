@@ -3,8 +3,11 @@ package api
 import (
 	"crypto/tls"
 	"net/http"
+	"net/url"
+	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
 
 	"golang.org/x/crypto/acme/autocert"
 )
@@ -78,8 +81,22 @@ func (s *Rest) makeHTTPSServer(address string, port int, router http.Handler) *h
 	return server
 }
 
+// httpChallengeRouter creates new router which performs ACME "http-01" challenge response
+// with default middlewares. This part is necessary to obtain certificate from LE.
+// If it receives not a acme challenge it performs redirect to https server.
+// Used in 'auto' ssl mode.
+func (s *Rest) httpChallengeRouter(m *autocert.Manager) chi.Router {
+	s.Logger.Printf("[DEBUG] create http-challenge routes")
+	router := chi.NewRouter()
+	router.Use(middleware.Throttle(1000), middleware.RealIP, Recoverer(s.Logger))
+	router.Use(middleware.Throttle(1000), middleware.Timeout(60*time.Second))
+
+	router.Handle("/*", m.HTTPHandler(s.redirectHandler()))
+	return router
+}
+
 // getHost returns hostname for remark server.
-// For example for remarkURL https://remark.com:443 it should return remark.com
+// For example for trustAnchorURL https://trust-anchor.obada.com:443 it should return trust-anchor.obada.com
 func (s *Rest) getRemarkHost() string {
 	u, err := url.Parse(s.TrustAnchorURL)
 	if err != nil {

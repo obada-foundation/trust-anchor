@@ -6,8 +6,11 @@ require (
 	github.com/dgraph-io/badger/v3 v3.2103.2
 	github.com/go-chi/chi/v5 v5.0.7
 	github.com/go-chi/jwtauth/v5 v5.0.2
+	github.com/go-chi/render v1.0.1
+	github.com/google/uuid v1.3.0
 	github.com/jessevdk/go-flags v1.5.0
-	golang.org/x/crypto v0.0.0-20201217014255-9d1352758620
+	github.com/kataras/jwt v0.1.2
+	golang.org/x/crypto v0.0.0-20201221181555-eec23a3978ad
 )
 
 require (
@@ -28,7 +31,7 @@ require (
 	github.com/lestrrat-go/blackmagic v1.0.0 // indirect
 	github.com/lestrrat-go/httpcc v1.0.0 // indirect
 	github.com/lestrrat-go/iter v1.0.1 // indirect
-	github.com/lestrrat-go/jwx v1.2.6 // indirect
+	github.com/lestrrat-go/jwx v1.2.6 // direct
 	github.com/lestrrat-go/option v1.0.0 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	go.opencensus.io v0.22.5 // indirect
