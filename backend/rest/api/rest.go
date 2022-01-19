@@ -111,7 +111,7 @@ func (s *Rest) routes() chi.Router {
 		rapi.Group(func(rpub chi.Router) {
 			rpub.Post("/user/register", s.publicRest.registerUser)
 			rpub.Get("/token", s.publicRest.token)
-			rpub.Get("/verify", s.publicRest.verifyToken)
+			rpub.Post("/verify", s.publicRest.verifyToken)
 		})
 	})
 

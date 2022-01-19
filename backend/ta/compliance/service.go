@@ -17,9 +17,12 @@ func New(tokenSvc *ta.TokenService) *Service {
 
 // CheckByToken checks if owner of token is compliant
 func (s Service) CheckByToken(token string) (bool, error) {
-	s.taTokenSvc.VerifyToken(token)
+	_, err := s.taTokenSvc.VerifyToken(token)
+	if err != nil {
+		return false, err
+	}
 
-	return false, nil
+	return true, nil
 }
 
 func (s Service) CheckByUser() (bool, error) {

@@ -65,7 +65,7 @@ func (rpub *public) token(w http.ResponseWriter, r *http.Request) {
 
 	_, tokenStr, err := rpub.authTokenSvc.Encode(map[string]interface{}{"user_id": fmt.Sprintf("%s", userID)})
 	if err != nil {
-		rest.SendErrorJSON(w, r, http.StatusBadRequest, err, "cannot create a wallet", rest.ErrDecode)
+		rest.SendErrorJSON(w, r, http.StatusBadRequest, err, "cannot create a wallet", rest.ErrDecode, rpub.logger)
 		return
 
 	}

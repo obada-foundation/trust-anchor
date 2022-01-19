@@ -17,7 +17,7 @@ const (
 	ErrCommentNotFound      = 1  // can't find comment
 	ErrDecode               = 2  // failed to unmarshal incoming request
 	ErrNoAccess             = 3  // rejected by auth
-	ErrCommentValidation    = 4  // validation failed
+	ErrValidation           = 4  // validation failed
 	ErrPostNotFound         = 5  // can't find post
 	ErrSiteNotFound         = 6  // can't find site
 	ErrUserBlocked          = 7  // user blocked
@@ -37,7 +37,7 @@ const (
 )
 
 // SendErrorJSON makes {error: blah, details: blah} json body and responds with error code
-func SendErrorJSON(w http.ResponseWriter, r *http.Request, httpStatusCode int, err error, details string, errCode int) {
+func SendErrorJSON(w http.ResponseWriter, r *http.Request, httpStatusCode int, err error, details string, errCode int, logger *log.Logger) {
 	log.Printf("[WARN] %s", errDetailsMsg(r, httpStatusCode, err, details, errCode))
 	render.Status(r, httpStatusCode)
 	render.JSON(w, r, JSON{"error": err.Error(), "details": details, "code": errCode})
