@@ -105,7 +105,7 @@ func (s *Rest) routes() chi.Router {
 			rpriv.Use(jwtauth.Verifier(s.AuthTokenSvc))
 			rpriv.Use(jwtauth.Authenticator)
 
-			rpriv.Post("/nft/register", s.privateRest.registerNFT)
+			rpriv.Post("/issue-token", s.privateRest.issueToken)
 		})
 
 		rapi.Group(func(rpub chi.Router) {

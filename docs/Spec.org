@@ -17,18 +17,20 @@ eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2NDI2ODAxMTksImlzcyI6Im9iYWRhLXR
 ** Decoded token body represented as a JSON ([[https://datatracker.ietf.org/doc/html/rfc7519#page-8][JWT claims]])
 
 #+begin_src javascript
-  "iat": 1642680119,
-  "iss": "obada-trust-anchor-org",
+{
+  "iat": 1642698190,
   "nft": "did:obada:123456789",
   "sub": "815bc07a-4502-4f68-9254-46d7fa698d12",
+  "ta": "obada-trust-anchor-org",
   "url": "http://localhost/api/v1/verify"
+}
 #+end_src
 
 **** "[[https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.6][iat]]" identifies the time at which the JWT was issued. The value must be a NumericDate.
 **** "[[https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.1][iss]]" identifies TrustAnchor organization that issued the JWT.
 **** "nft" identifies obit DID address for which trust anchor will generate a token.
 **** "sub" (subject) identifies a user that exists in internal TrustAnchor database and against which API clients will check compliance status.
-**** "url" identifies TrustAnchor API url that should be used for checking compliance status of OBADA actor.
+**** "verifyUrl" identifies TrustAnchor API url that should be used for checking compliance status of OBADA actor.
 
 The origin idea was that this token can be converted back to HTTP request to the origin trust anchor API that issued it. Only API is able to tell us if user complied or not at the moment of request. 
 
