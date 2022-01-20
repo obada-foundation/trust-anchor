@@ -13,8 +13,9 @@ import (
 var revision = "unknown"
 
 type opts struct {
-	DBPath    string            `long:"db-path" description:"Path to database files" default:"/var/obada/trust-anchor/data"`
-	ServerCmd cmd.ServerCommand `command:"server"`
+	DBPath         string            `long:"db-path" description:"Path to database files" default:"/var/obada/trust-anchor/data"`
+	TrustAnchorURL string            `long:"url" env:"TA_URL" required:"true" description:"url to trust anchor"`
+	ServerCmd      cmd.ServerCommand `command:"server"`
 }
 
 func main() {
@@ -46,9 +47,10 @@ func run(logger *log.Logger, o *opts) error {
 
 		c := command.(cmd.CommonOptionsCommander)
 		c.SetCommon(cmd.CommonOpts{
-			Revision: revision,
-			Logger:   logger,
-			DB:       db,
+			Revision:       revision,
+			Logger:         logger,
+			DB:             db,
+			TrustAnchorURL: o.TrustAnchorURL,
 		})
 
 		err = c.Execute(args)

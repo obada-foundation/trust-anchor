@@ -31,6 +31,7 @@ type AuthGroup struct {
 }
 
 type TrustAnchorTokenGroup struct {
+	Issuer string `long:"issuer" env:"ISSUER" default:"obada-trust-anchor-org" required:"true"`
 	//PublicKeyPath  string `long:"public-key-path" env:"PUBLIC_KEY" required:"true"`
 	//PrivateKeyPath string `long:"private-key-path" env:"PRIVATE_KEY" required:"true"`
 }
@@ -73,10 +74,6 @@ func (s *ServerCommand) Execute(_ []string) error {
 	return nil
 }
 
-func loadCert(privFile, pubFile string) {
-
-}
-
 // newServerApp prepares application and return it with all active parts
 // doesn't start anything
 func (s *ServerCommand) newServerApp() *serverApp {
@@ -85,7 +82,7 @@ func (s *ServerCommand) newServerApp() *serverApp {
 	privKey, pubKey := jwt.MustLoadEdDSA(s.Auth.PrivateKeyPath, s.Auth.PublicKeyPath)
 
 	// TrustAnchor token service
-	taTokenSvc := ta.New(privKey, pubKey)
+	taTokenSvc := ta.New(s.TAToken.Issuer, s.TrustAnchorURL, privKey, pubKey)
 
 	// Compliance service
 	cmpSvc := compliance.New(taTokenSvc)
@@ -94,11 +91,12 @@ func (s *ServerCommand) newServerApp() *serverApp {
 	authTokenSvc := jwtauth.New("EdDSA", privKey, pubKey)
 
 	srv := &api.Rest{
-		AuthTokenSvc:  authTokenSvc,
-		TaTokenSvc:    taTokenSvc,
-		ComplianceSvc: cmpSvc,
-		Logger:        s.Logger,
-		SSLConfig:     sslConfig,
+		AuthTokenSvc:   authTokenSvc,
+		TaTokenSvc:     taTokenSvc,
+		ComplianceSvc:  cmpSvc,
+		Logger:         s.Logger,
+		SSLConfig:      sslConfig,
+		TrustAnchorURL: s.TrustAnchorURL,
 	}
 
 	return &serverApp{

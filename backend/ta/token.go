@@ -2,31 +2,41 @@ package ta
 
 import (
 	"errors"
+	"fmt"
+	"time"
 
 	"github.com/lestrrat-go/jwx/jwa"
 	"github.com/lestrrat-go/jwx/jwt"
 )
 
 type TokenService struct {
-	alg      jwa.SignatureAlgorithm
-	verifier jwt.ParseOption
-	signKey  interface{}
+	issuer    string
+	verifyUrl string
+	alg       jwa.SignatureAlgorithm
+	verifier  jwt.ParseOption
+	signKey   interface{}
 }
 
-func New(signKey, verifyKey interface{}) *TokenService {
+func New(issuer, taUrl string, signKey, verifyKey interface{}) *TokenService {
 	ja := jwa.SignatureAlgorithm("EdDSA")
 
 	return &TokenService{
-		alg:      ja,
-		verifier: jwt.WithVerify(ja, verifyKey),
-		signKey:  signKey,
+		alg:       ja,
+		verifier:  jwt.WithVerify(ja, verifyKey),
+		signKey:   signKey,
+		issuer:    issuer,
+		verifyUrl: fmt.Sprintf("%s/api/v1/verify", taUrl),
 	}
 }
 
-func (ts TokenService) CreateToken(DID string) (t jwt.Token, tokenStr string, err error) {
+func (ts TokenService) CreateToken(DID, userID string) (t jwt.Token, tokenStr string, err error) {
 	t = jwt.New()
 
-	t.Set("did", DID)
+	t.Set("nft", DID)
+	t.Set(jwt.IssuerKey, ts.issuer)
+	t.Set(jwt.IssuedAtKey, time.Now())
+	t.Set(jwt.SubjectKey, userID)
+	t.Set("url", ts.verifyUrl)
 
 	payload, err := jwt.Sign(t, ts.alg, ts.signKey)
 	if err != nil {
