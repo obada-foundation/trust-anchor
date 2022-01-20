@@ -1,102 +1,68 @@
 
 # Table of Contents
 
-1.  [JWT signatures method](#org1217f6f)
-    1.  [PHP version](#org2ceabb4)
-        1.  [RSAES-PKCS1-v1<sub>5</sub> is no longer safe for encryption, RSASSA-PKCS1-v1<sub>5</sub> is still suitable for digital signatures.](#org008e77d)
-        2.  [JWTs signed with RSASSA-PKCS1-v1<sub>5</sub> have a deterministic signature, meaning that the same JWT header & payload will always generate the same signature.](#org587730f)
-        3.  [Hashing algorithm used by the signature algorithm. 256 means SHA-256.](#org2639694)
-        4.  [Full details in RFC 7518](#org58c6792)
-    2.  [Go version](#orgc0c97ed)
-2.  [JWT token structure and how proofs work](#orge44836c)
-    1.  [JWT token encoded by Base64](#orgf40fc05)
-    2.  [Decoded token body represented as a JSON](#org419e33b)
-    3.  [Verification with jwt.io](#orgf992f85)
-3.  [Verifyable credentils and DIDs](#org2b767b7)
+1.  [JWT signatures method](#orge96b29b)
+2.  [JWT token structure and how proofs work](#orge698e4d)
+    1.  [JWT token encoded by Base64](#org37c2deb)
+    2.  [Decoded token body represented as a JSON (JWT claims)](#org7a5aa0c)
+    3.  [Verification with jwt.io](#orge31324f)
+3.  [Verifiable credentils and DIDs](#orgbf692b8)
 
 
 
-<a id="org1217f6f"></a>
+<a id="orge96b29b"></a>
 
 # JWT signatures method
 
-
-<a id="org2ceabb4"></a>
-
-## PHP version
-
-PHP based application version of trust-anchror uses RS256 algorithm. RS means RSASSA-PKCS1-v1<sub>5</sub>. There some important information about this method:
+For signing and verification TrustAnchor tokens we are using EdDSA (Ed25519), see  [benefits](https://ed25519.cr.yp.to/)
 
 
-<a id="org008e77d"></a>
-
-### RSAES-PKCS1-v1<sub>5</sub> is no longer safe for encryption, RSASSA-PKCS1-v1<sub>5</sub> is still suitable for digital signatures.
-
-
-<a id="org587730f"></a>
-
-### JWTs signed with RSASSA-PKCS1-v1<sub>5</sub> have a deterministic signature, meaning that the same JWT header & payload will always generate the same signature.
-
-
-<a id="org2639694"></a>
-
-### Hashing algorithm used by the signature algorithm. 256 means SHA-256.
-
-
-<a id="org58c6792"></a>
-
-### Full details in [RFC 7518](https://datatracker.ietf.org/doc/html/rfc7518)
-
-
-<a id="orgc0c97ed"></a>
-
-## Go version
-
-Go version going to use EdDSA signatures, see   [benefits](https://ed25519.cr.yp.to/)
-
-
-<a id="orge44836c"></a>
+<a id="orge698e4d"></a>
 
 # JWT token structure and how proofs work
 
 
-<a id="orgf40fc05"></a>
+<a id="org37c2deb"></a>
 
 ## JWT token encoded by Base64
 
-    eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ0cmFkZWxvb3AiLCJ2ZXJpZmljYXRpb25fdXJsIjoiaHR0cHM6XC9cL3RydXN0LWFuY2hvci50cmFkZWxvb3AuY29tIiwidmVyaWZpY2F0aW9uX2h0dHBfbWV0aG9kIjoiUE9TVCIsInZlcmlmaWNhdGlvbl9odHRwX3Zhcl9uYW1lIjoidG9rZW4iLCJpYXQiOjE2NDAwOTI4MDcsImF1ZCI6ImI3M2UyZDIyLTYyNjAtMTFlYy1hMTZhLTAyNDJhYzE0MDAwMyIsInJlZ2lzdHJhcl9pZCI6ImI1ZGIyZTg4YTE1ODI5Y2UzYTFiNTU2NjE3NmUxMTBjIn0.LDh0tYx_ZlS01i5hwJhuQLGrucmVtCpN5s_k0qwiWA3wXDPV31saaJKqv-RAA_h3lnSKbx6LTiTVIjcgZz_xmXyo32xG96zhCpV-QIwEGw5yV-U3IpVjvxKJD6dbrEldZxcyJalmXoQppfE7hM1kWUrrHPsLKq4UJDkN0DJnCslTkgnXsAm1JCJC9U0L9I4IEas1q2N-MsJ8iaioPc03pttllUmarVXgia3PgRK_P4cAQy_XW22WgazyxxG9v2Eo5wzKFmL90_gOjdI-N8x-3swJ0TawFt-AASoQwVnUgUmSGNUxSAXEV1tVLrzCnz4cIKFCXj5AuqZEbqvAq-m9GNv7jARrM2n9b0z9lw39EkheeYVMfRtZUVpL6CJNQUGvHPZsLCGv_mCwFH6ZUGdthmPbcP6mWfadQpZtXzOjVgl7jXMwsss-8NxusWgqhRO8YhU10yR6_S3X9shy9s6h3JCeMfIXUnFT6E-l2ntEzXWYt0HBBkSkacqpNSHSbqeRhOKZE2jprwZfKB4SRIHqAAoOTAfoLDGLdweWaNZ9nqJtjcsd1wKcDjZexpv8sN1qy6_9Td4MM7gJIRUeS4nZlVj4_OQtSMbWDMWnZku6CA7RGd7e9KDUbeWGLXJ5Smx8Z-vFCT9Is_KF5zFJhEOPvD_kbGYE4vKCUzHvdcTg9kU
+    eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2NDI2ODAxMTksImlzcyI6Im9iYWRhLXRydXN0LWFuY2hvci1vcmciLCJuZnQiOiJkaWQ6b2JhZGE6MTIzNDU2Nzg5Iiwic3ViIjoiODE1YmMwN2EtNDUwMi00ZjY4LTkyNTQtNDZkN2ZhNjk4ZDEyIiwidXJsIjoiaHR0cDovL2xvY2FsaG9zdC9hcGkvdjEvdmVyaWZ5In0.V1U1mF2qMcvDpmPPNoqlGv--_7et10U5I5uLXVMYZagzry1gR8QXg5Z8sJ8_sIW92GnuTl8n-oPUtu6Lf9LTAA
 
 
-<a id="org419e33b"></a>
+<a id="org7a5aa0c"></a>
 
-## Decoded token body represented as a JSON
-
-    {
-      "iss": "tradeloop",
-      "verification_url": "https://trust-anchor.tradeloop.com",
-      "verification_http_method": "POST",
-      "verification_http_var_name": "token",
-      "iat": 1640092807,
-      "aud": "b73e2d22-6260-11ec-a16a-0242ac140003",
-      "registrar_id": "b5db2e88a15829ce3a1b5566176e110c"
-    }
-
-TODO:
-
--   Identify properties naming and types
-
-The origin idea was that this token can be converted back to HTTP request to the origin trust anchor API that issued it. Only API is able to tell us if user complied or not at the moment of request. 
-
-    curl -X POST https://trust-anchor.tradeloop.com -H 'content-type: application/json' -d '{"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ0cmFkZWxvb3AiLCJ2ZXJpZmljYXRpb25fdXJsIjoiaHR0cHM6XC9cL3RydXN0LWFuY2hvci50cmFkZWxvb3AuY29tIiwidmVyaWZpY2F0aW9uX2h0dHBfbWV0aG9kIjoiUE9TVCIsInZlcmlmaWNhdGlvbl9odHRwX3Zhcl9uYW1lIjoidG9rZW4iLCJpYXQiOjE2NDAwOTI4MDcsImF1ZCI6ImI3M2UyZDIyLTYyNjAtMTFlYy1hMTZhLTAyNDJhYzE0MDAwMyIsInJlZ2lzdHJhcl9pZCI6ImI1ZGIyZTg4YTE1ODI5Y2UzYTFiNTU2NjE3NmUxMTBjIn0.LDh0tYx_ZlS01i5hwJhuQLGrucmVtCpN5s_k0qwiWA3wXDPV31saaJKqv-RAA_h3lnSKbx6LTiTVIjcgZz_xmXyo32xG96zhCpV-QIwEGw5yV-U3IpVjvxKJD6dbrEldZxcyJalmXoQppfE7hM1kWUrrHPsLKq4UJDkN0DJnCslTkgnXsAm1JCJC9U0L9I4IEas1q2N-MsJ8iaioPc03pttllUmarVXgia3PgRK_P4cAQy_XW22WgazyxxG9v2Eo5wzKFmL90_gOjdI-N8x-3swJ0TawFt-AASoQwVnUgUmSGNUxSAXEV1tVLrzCnz4cIKFCXj5AuqZEbqvAq-m9GNv7jARrM2n9b0z9lw39EkheeYVMfRtZUVpL6CJNQUGvHPZsLCGv_mCwFH6ZUGdthmPbcP6mWfadQpZtXzOjVgl7jXMwsss-8NxusWgqhRO8YhU10yR6_S3X9shy9s6h3JCeMfIXUnFT6E-l2ntEzXWYt0HBBkSkacqpNSHSbqeRhOKZE2jprwZfKB4SRIHqAAoOTAfoLDGLdweWaNZ9nqJtjcsd1wKcDjZexpv8sN1qy6_9Td4MM7gJIRUeS4nZlVj4_OQtSMbWDMWnZku6CA7RGd7e9KDUbeWGLXJ5Smx8Z-vFCT9Is_KF5zFJhEOPvD_kbGYE4vKCUzHvdcTg9kU"}'
-
-After executing such request we can see if user complient or not:
+## Decoded token body represented as a JSON ([JWT claims](https://datatracker.ietf.org/doc/html/rfc7519#page-8))
 
     {
-      "is_complient": true
+      "iat": 1642698190,
+      "nft": "did:obada:123456789",
+      "sub": "815bc07a-4502-4f68-9254-46d7fa698d12",
+      "ta": "obada-trust-anchor-org",
+      "url": "http://localhost/api/v1/verify"
     }
 
+1.  "[iat](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.6)" identifies the time at which the JWT was issued. The value must be a NumericDate.
 
-<a id="orgf992f85"></a>
+2.  "[iss](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.1)" identifies TrustAnchor organization that issued the JWT.
+
+3.  "nft" identifies obit DID address for which trust anchor will generate a token.
+
+4.  "sub" (subject) identifies a user that exists in internal TrustAnchor database and against which API clients will check compliance status.
+
+5.  "verifyUrl" identifies TrustAnchor API url that should be used for checking compliance status of OBADA actor.
+
+    The origin idea was that this token can be converted back to HTTP request to the origin trust anchor API that issued it. Only API is able to tell us if user complied or not at the moment of request. 
+    
+        curl -X POST http://localhost/api/v1/verify -H 'content-type: application/json' -d '{"token":"eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2NDI2ODAxMTksImlzcyI6Im9iYWRhLXRydXN0LWFuY2hvci1vcmciLCJuZnQiOiJkaWQ6b2JhZGE6MTIzNDU2Nzg5Iiwic3ViIjoiODE1YmMwN2EtNDUwMi00ZjY4LTkyNTQtNDZkN2ZhNjk4ZDEyIiwidXJsIjoiaHR0cDovL2xvY2FsaG9zdC9hcGkvdjEvdmVyaWZ5In0.V1U1mF2qMcvDpmPPNoqlGv--_7et10U5I5uLXVMYZagzry1gR8QXg5Z8sJ8_sIW92GnuTl8n-oPUtu6Lf9LTAA"}'
+    
+    After executing such request we can see if user compliant or not:
+    
+        {
+          "is_compliant": true
+        }
+
+
+<a id="orge31324f"></a>
 
 ## Verification with [jwt.io](https://jwt.io/#debugger-io?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ0cmFkZWxvb3AiLCJ2ZXJpZmljYXRpb25fdXJsIjoiaHR0cHM6XC9cL3RydXN0LWFuY2hvci50cmFkZWxvb3AuY29tIiwidmVyaWZpY2F0aW9uX2h0dHBfbWV0aG9kIjoiUE9TVCIsInZlcmlmaWNhdGlvbl9odHRwX3Zhcl9uYW1lIjoidG9rZW4iLCJpYXQiOjE2NDAwOTI4MDcsImF1ZCI6ImI3M2UyZDIyLTYyNjAtMTFlYy1hMTZhLTAyNDJhYzE0MDAwMyIsInJlZ2lzdHJhcl9pZCI6ImI1ZGIyZTg4YTE1ODI5Y2UzYTFiNTU2NjE3NmUxMTBjIn0.LDh0tYx_ZlS01i5hwJhuQLGrucmVtCpN5s_k0qwiWA3wXDPV31saaJKqv-RAA_h3lnSKbx6LTiTVIjcgZz_xmXyo32xG96zhCpV-QIwEGw5yV-U3IpVjvxKJD6dbrEldZxcyJalmXoQppfE7hM1kWUrrHPsLKq4UJDkN0DJnCslTkgnXsAm1JCJC9U0L9I4IEas1q2N-MsJ8iaioPc03pttllUmarVXgia3PgRK_P4cAQy_XW22WgazyxxG9v2Eo5wzKFmL90_gOjdI-N8x-3swJ0TawFt-AASoQwVnUgUmSGNUxSAXEV1tVLrzCnz4cIKFCXj5AuqZEbqvAq-m9GNv7jARrM2n9b0z9lw39EkheeYVMfRtZUVpL6CJNQUGvHPZsLCGv_mCwFH6ZUGdthmPbcP6mWfadQpZtXzOjVgl7jXMwsss-8NxusWgqhRO8YhU10yR6_S3X9shy9s6h3JCeMfIXUnFT6E-l2ntEzXWYt0HBBkSkacqpNSHSbqeRhOKZE2jprwZfKB4SRIHqAAoOTAfoLDGLdweWaNZ9nqJtjcsd1wKcDjZexpv8sN1qy6_9Td4MM7gJIRUeS4nZlVj4_OQtSMbWDMWnZku6CA7RGd7e9KDUbeWGLXJ5Smx8Z-vFCT9Is_KF5zFJhEOPvD_kbGYE4vKCUzHvdcTg9kU)
 
@@ -183,7 +149,7 @@ Copy private key:
 You should keep see "Signature Verified" same as before. Try to change token body or public or private key to see how it change signature check status.
 
 
-<a id="org2b767b7"></a>
+<a id="orgbf692b8"></a>
 
-# Verifyable credentils and DIDs
+# Verifiable credentils and DIDs
 
