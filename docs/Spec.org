@@ -4,21 +4,7 @@
 
 * JWT signatures method
 
-** PHP version
-
-PHP based application version of trust-anchror uses RS256 algorithm. RS means RSASSA-PKCS1-v1_5. There some important information about this method:
-
-*** RSAES-PKCS1-v1_5 is no longer safe for encryption, RSASSA-PKCS1-v1_5 is still suitable for digital signatures.
-
-*** JWTs signed with RSASSA-PKCS1-v1_5 have a deterministic signature, meaning that the same JWT header & payload will always generate the same signature. 
-
-*** Hashing algorithm used by the signature algorithm. 256 means SHA-256.
-
-*** Full details in [[https://datatracker.ietf.org/doc/html/rfc7518][RFC 7518]]
-
-** Go version
-
-Go version going to use EdDSA signatures, see   [[https://ed25519.cr.yp.to/][benefits]]
+For signing and verification TrustAnchor tokens we are using EdDSA (Ed25519), see  [[https://ed25519.cr.yp.to/][benefits]]
 
 * JWT token structure and how proofs work
 
