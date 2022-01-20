@@ -4,58 +4,45 @@
 
 * JWT signatures method
 
-** PHP version
-
-PHP based application version of trust-anchror uses RS256 algorithm. RS means RSASSA-PKCS1-v1_5. There some important information about this method:
-
-*** RSAES-PKCS1-v1_5 is no longer safe for encryption, RSASSA-PKCS1-v1_5 is still suitable for digital signatures.
-
-*** JWTs signed with RSASSA-PKCS1-v1_5 have a deterministic signature, meaning that the same JWT header & payload will always generate the same signature. 
-
-*** Hashing algorithm used by the signature algorithm. 256 means SHA-256.
-
-*** Full details in [[https://datatracker.ietf.org/doc/html/rfc7518][RFC 7518]]
-
-** Go version
-
-Go version going to use EdDSA signatures, see   [[https://ed25519.cr.yp.to/][benefits]]
+For signing and verification TrustAnchor tokens we are using EdDSA (Ed25519), see  [[https://ed25519.cr.yp.to/][benefits]]
 
 * JWT token structure and how proofs work
 
 ** JWT token encoded by Base64
 
 #+begin_src sh
-eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ0cmFkZWxvb3AiLCJ2ZXJpZmljYXRpb25fdXJsIjoiaHR0cHM6XC9cL3RydXN0LWFuY2hvci50cmFkZWxvb3AuY29tIiwidmVyaWZpY2F0aW9uX2h0dHBfbWV0aG9kIjoiUE9TVCIsInZlcmlmaWNhdGlvbl9odHRwX3Zhcl9uYW1lIjoidG9rZW4iLCJpYXQiOjE2NDAwOTI4MDcsImF1ZCI6ImI3M2UyZDIyLTYyNjAtMTFlYy1hMTZhLTAyNDJhYzE0MDAwMyIsInJlZ2lzdHJhcl9pZCI6ImI1ZGIyZTg4YTE1ODI5Y2UzYTFiNTU2NjE3NmUxMTBjIn0.LDh0tYx_ZlS01i5hwJhuQLGrucmVtCpN5s_k0qwiWA3wXDPV31saaJKqv-RAA_h3lnSKbx6LTiTVIjcgZz_xmXyo32xG96zhCpV-QIwEGw5yV-U3IpVjvxKJD6dbrEldZxcyJalmXoQppfE7hM1kWUrrHPsLKq4UJDkN0DJnCslTkgnXsAm1JCJC9U0L9I4IEas1q2N-MsJ8iaioPc03pttllUmarVXgia3PgRK_P4cAQy_XW22WgazyxxG9v2Eo5wzKFmL90_gOjdI-N8x-3swJ0TawFt-AASoQwVnUgUmSGNUxSAXEV1tVLrzCnz4cIKFCXj5AuqZEbqvAq-m9GNv7jARrM2n9b0z9lw39EkheeYVMfRtZUVpL6CJNQUGvHPZsLCGv_mCwFH6ZUGdthmPbcP6mWfadQpZtXzOjVgl7jXMwsss-8NxusWgqhRO8YhU10yR6_S3X9shy9s6h3JCeMfIXUnFT6E-l2ntEzXWYt0HBBkSkacqpNSHSbqeRhOKZE2jprwZfKB4SRIHqAAoOTAfoLDGLdweWaNZ9nqJtjcsd1wKcDjZexpv8sN1qy6_9Td4MM7gJIRUeS4nZlVj4_OQtSMbWDMWnZku6CA7RGd7e9KDUbeWGLXJ5Smx8Z-vFCT9Is_KF5zFJhEOPvD_kbGYE4vKCUzHvdcTg9kU
+eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2NDI2ODAxMTksImlzcyI6Im9iYWRhLXRydXN0LWFuY2hvci1vcmciLCJuZnQiOiJkaWQ6b2JhZGE6MTIzNDU2Nzg5Iiwic3ViIjoiODE1YmMwN2EtNDUwMi00ZjY4LTkyNTQtNDZkN2ZhNjk4ZDEyIiwidXJsIjoiaHR0cDovL2xvY2FsaG9zdC9hcGkvdjEvdmVyaWZ5In0.V1U1mF2qMcvDpmPPNoqlGv--_7et10U5I5uLXVMYZagzry1gR8QXg5Z8sJ8_sIW92GnuTl8n-oPUtu6Lf9LTAA
 #+end_src
 
-** Decoded token body represented as a JSON
+** Decoded token body represented as a JSON ([[https://datatracker.ietf.org/doc/html/rfc7519#page-8][JWT claims]])
 
 #+begin_src javascript
 {
-  "iss": "tradeloop",
-  "verification_url": "https://trust-anchor.tradeloop.com",
-  "verification_http_method": "POST",
-  "verification_http_var_name": "token",
-  "iat": 1640092807,
-  "aud": "b73e2d22-6260-11ec-a16a-0242ac140003",
-  "registrar_id": "b5db2e88a15829ce3a1b5566176e110c"
+  "iat": 1642698190,
+  "nft": "did:obada:123456789",
+  "sub": "815bc07a-4502-4f68-9254-46d7fa698d12",
+  "ta": "obada-trust-anchor-org",
+  "url": "http://localhost/api/v1/verify"
 }
 #+end_src
 
-TODO:
-- Identify properties naming and types 
+**** "[[https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.6][iat]]" identifies the time at which the JWT was issued. The value must be a NumericDate.
+**** "[[https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.1][iss]]" identifies TrustAnchor organization that issued the JWT.
+**** "nft" identifies obit DID address for which trust anchor will generate a token.
+**** "sub" (subject) identifies a user that exists in internal TrustAnchor database and against which API clients will check compliance status.
+**** "verifyUrl" identifies TrustAnchor API url that should be used for checking compliance status of OBADA actor.
 
 The origin idea was that this token can be converted back to HTTP request to the origin trust anchor API that issued it. Only API is able to tell us if user complied or not at the moment of request. 
 
 #+begin_src sh
-curl -X POST https://trust-anchor.tradeloop.com -H 'content-type: application/json' -d '{"token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpc3MiOiJ0cmFkZWxvb3AiLCJ2ZXJpZmljYXRpb25fdXJsIjoiaHR0cHM6XC9cL3RydXN0LWFuY2hvci50cmFkZWxvb3AuY29tIiwidmVyaWZpY2F0aW9uX2h0dHBfbWV0aG9kIjoiUE9TVCIsInZlcmlmaWNhdGlvbl9odHRwX3Zhcl9uYW1lIjoidG9rZW4iLCJpYXQiOjE2NDAwOTI4MDcsImF1ZCI6ImI3M2UyZDIyLTYyNjAtMTFlYy1hMTZhLTAyNDJhYzE0MDAwMyIsInJlZ2lzdHJhcl9pZCI6ImI1ZGIyZTg4YTE1ODI5Y2UzYTFiNTU2NjE3NmUxMTBjIn0.LDh0tYx_ZlS01i5hwJhuQLGrucmVtCpN5s_k0qwiWA3wXDPV31saaJKqv-RAA_h3lnSKbx6LTiTVIjcgZz_xmXyo32xG96zhCpV-QIwEGw5yV-U3IpVjvxKJD6dbrEldZxcyJalmXoQppfE7hM1kWUrrHPsLKq4UJDkN0DJnCslTkgnXsAm1JCJC9U0L9I4IEas1q2N-MsJ8iaioPc03pttllUmarVXgia3PgRK_P4cAQy_XW22WgazyxxG9v2Eo5wzKFmL90_gOjdI-N8x-3swJ0TawFt-AASoQwVnUgUmSGNUxSAXEV1tVLrzCnz4cIKFCXj5AuqZEbqvAq-m9GNv7jARrM2n9b0z9lw39EkheeYVMfRtZUVpL6CJNQUGvHPZsLCGv_mCwFH6ZUGdthmPbcP6mWfadQpZtXzOjVgl7jXMwsss-8NxusWgqhRO8YhU10yR6_S3X9shy9s6h3JCeMfIXUnFT6E-l2ntEzXWYt0HBBkSkacqpNSHSbqeRhOKZE2jprwZfKB4SRIHqAAoOTAfoLDGLdweWaNZ9nqJtjcsd1wKcDjZexpv8sN1qy6_9Td4MM7gJIRUeS4nZlVj4_OQtSMbWDMWnZku6CA7RGd7e9KDUbeWGLXJ5Smx8Z-vFCT9Is_KF5zFJhEOPvD_kbGYE4vKCUzHvdcTg9kU"}'
+curl -X POST http://localhost/api/v1/verify -H 'content-type: application/json' -d '{"token":"eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9.eyJpYXQiOjE2NDI2ODAxMTksImlzcyI6Im9iYWRhLXRydXN0LWFuY2hvci1vcmciLCJuZnQiOiJkaWQ6b2JhZGE6MTIzNDU2Nzg5Iiwic3ViIjoiODE1YmMwN2EtNDUwMi00ZjY4LTkyNTQtNDZkN2ZhNjk4ZDEyIiwidXJsIjoiaHR0cDovL2xvY2FsaG9zdC9hcGkvdjEvdmVyaWZ5In0.V1U1mF2qMcvDpmPPNoqlGv--_7et10U5I5uLXVMYZagzry1gR8QXg5Z8sJ8_sIW92GnuTl8n-oPUtu6Lf9LTAA"}'
 #+end_src
 
-After executing such request we can see if user complient or not:
+After executing such request we can see if user compliant or not:
 
 #+begin_src javascript
   {
-    "is_complient": true
+    "is_compliant": true
   }
 #+end_src
 
@@ -150,4 +137,4 @@ BHz8rfWI0XeiubOH4JHjEVt6+py8Wgt+JVS/5Z8uTtKPVXbzjR7S3TBrcA/tY2rl
 
 You should keep see "Signature Verified" same as before. Try to change token body or public or private key to see how it change signature check status.
 
-* Verifyable credentils and DIDs
+* Verifiable credentils and DIDs

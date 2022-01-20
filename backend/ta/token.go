@@ -29,14 +29,13 @@ func New(issuer, taUrl string, signKey, verifyKey interface{}) *TokenService {
 	}
 }
 
-func (ts TokenService) CreateToken(DID, userID string) (t jwt.Token, tokenStr string, err error) {
+func (ts TokenService) CreateToken(userID string) (t jwt.Token, tokenStr string, err error) {
 	t = jwt.New()
 
-	t.Set("nft", DID)
-	t.Set(jwt.IssuerKey, ts.issuer)
+	t.Set("iss", ts.issuer)
 	t.Set(jwt.IssuedAtKey, time.Now())
 	t.Set(jwt.SubjectKey, userID)
-	t.Set("url", ts.verifyUrl)
+	t.Set("verifyUrl", ts.verifyUrl)
 
 	payload, err := jwt.Sign(t, ts.alg, ts.signKey)
 	if err != nil {
