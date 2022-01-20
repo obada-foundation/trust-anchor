@@ -15,14 +15,16 @@ type CommonOptionsCommander interface {
 
 // CommonOpts sets externally from main, shared across all commands
 type CommonOpts struct {
-	Revision string
-	Logger   *log.Logger
-	DB       *badger.DB
+	TrustAnchorURL string
+	Revision       string
+	Logger         *log.Logger
+	DB             *badger.DB
 }
 
 // SetCommon satisfies CommonOptionsCommander interface and sets common option fields
 // The method called by main for each command
 func (c *CommonOpts) SetCommon(commonOpts CommonOpts) {
+	c.TrustAnchorURL = commonOpts.TrustAnchorURL
 	c.Revision = commonOpts.Revision
 	c.Logger = commonOpts.Logger
 	c.DB = commonOpts.DB

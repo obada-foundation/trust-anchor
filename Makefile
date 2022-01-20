@@ -2,9 +2,13 @@ backend/compile:
 	cd backend && go build -o trust-anchor
 
 backend/run:
-	cd backend && go run main.go server --db-path=../obada/trust-anchor/data
+	cd backend && go run main.go server \
+	--url http://localhost \
+	--db-path=../obada/trust-anchor/data \
+	--auth.private-key-path=$(HOME)/.ssh/ta_api.pem \
+	--auth.public-key-path=$(HOME)/.ssh/ta_api.pub.pem
 
-backend/vendor:
+Backend:
 	cd backend && go mod tidy && go mod vendor
 
 backend/lint:
