@@ -14,9 +14,10 @@ Backend:
 backend/lint:
 	cd backend && golangci-lint --config .golangci.yml run --print-issued-lines --out-format=github-actions ./...
 
-backend/docker/build:
+docker/build/develop:
+	docker build -t obada/trust-anchor:develop -f docker/Dockerfile .
 
-backend/docker/publish:
+docker/publish/develop:
 
 frontend/build: frontend/compile frontend/minify frontend/checksum frontend/clean frontend/embed
 
