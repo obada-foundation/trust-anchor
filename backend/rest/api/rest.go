@@ -10,6 +10,7 @@ import (
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/go-chi/cors"
 	"github.com/go-chi/jwtauth/v5"
 	"github.com/obada-foundation/trust-anchor/ta"
 	"github.com/obada-foundation/trust-anchor/ta/compliance"
@@ -97,11 +98,23 @@ func (s *Rest) routes() chi.Router {
 	router.Use(middleware.Throttle(1000), middleware.RealIP, Recoverer(s.Logger))
 	router.Use(AppInfo("Trust Anchor", "OBADA Foundation", s.Version), Ping)
 
+	corsMiddleware := cors.New(cors.Options{
+		AllowedOrigins:   []string{"https://*", "http://*"},
+		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
+		AllowedHeaders:   []string{"Accept", "Authorization", "Content-Type", "X-XSRF-Token", "X-JWT", "Origin", "X-Requested-With"},
+		ExposedHeaders:   []string{"Authorization"},
+		AllowCredentials: false,
+		MaxAge:           300,
+	})
+	router.Use(corsMiddleware.Handler)
+
 	s.publicRest, s.privateRest = s.handlerGroups()
 
 	// api routes
 	router.Route("/api/v1", func(rapi chi.Router) {
 		rapi.Group(func(rpriv chi.Router) {
+			rpriv.Use(corsMiddleware.Handler)
+
 			rpriv.Use(jwtauth.Verifier(s.AuthTokenSvc))
 			rpriv.Use(jwtauth.Authenticator)
 

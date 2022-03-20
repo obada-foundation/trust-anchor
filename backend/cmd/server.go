@@ -26,8 +26,8 @@ type ServerCommand struct {
 }
 
 type AuthGroup struct {
-	PublicKeyPath  string `long:"public-key-path" env:"PUBLIC_KEY" required:"true"`
-	PrivateKeyPath string `long:"private-key-path" env:"PRIVATE_KEY" required:"true"`
+	PublicKeyPath  string `long:"public-key-path" description:"public key for api auth" env:"PUBLIC_KEY" required:"true"`
+	PrivateKeyPath string `long:"private-key-path" description:"private key for api auth" env:"PRIVATE_KEY" required:"true"`
 }
 
 type TrustAnchorTokenGroup struct {
